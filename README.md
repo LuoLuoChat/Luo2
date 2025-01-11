@@ -37,7 +37,7 @@ python -m venv venv
    
    ```bash
    pip install -r requirements.txt
-   python main.py --web-port 8003
+   python main.py --web-port 8002
    ```
 
 3. 访问网页客户端：
