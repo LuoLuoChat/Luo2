@@ -34,12 +34,11 @@ python -m venv venv
 ```
 
 2. 安装依赖包并启动：
-   
+
    ```bash
    pip install -r requirements.txt
    python main.py
    ```
-
 3. 访问网页客户端：
    http://localhost:8002
 
@@ -49,13 +48,10 @@ python -m venv venv
 - API服务：http://localhost:8001
 - Web客户端：http://localhost:8002
 
-## 目录结构
+## 命令参数
 
-ChatServer/
-├── data/           # 数据存储
-├── static/         # 静态资源
-├── templates/      # 页面模板
-├── api_server.py   # API服务器
-├── web_server.py   # Web服务器
-├── server.py       # WebSocket服务器
-└── main.py         # 主程序
+- 需要使用main.py启动
+
+- 无命令行模式：`--no-command`
+- 指定Web端口号：`--web-port 8003`
+
