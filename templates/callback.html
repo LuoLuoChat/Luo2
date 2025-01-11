@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>处理登录...</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .error {
+            color: red;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid red;
+            background-color: #fff0f0;
+        }
+        .success {
+            color: green;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid green;
+            background-color: #f0fff0;
+        }
+        .debug {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f5f5f5;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div id="message">正在处理登录...</div>
+    <div id="debug" class="debug" style="display: none;"></div>
+
+    <script>
+        function showError(message, details = '') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = 'error';
+            messageDiv.textContent = message;
+            
+            const debugDiv = document.getElementById('debug');
+            if (details) {
+                debugDiv.style.display = 'block';
+                debugDiv.textContent = JSON.stringify(details, null, 2);
+            }
+        }
+
+        function showSuccess(message) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = 'success';
+            messageDiv.textContent = message;
+        }
+
+        // 从URL获取授权码
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const error = urlParams.get('error');
+        
+        if (error) {
+            showError('OAuth授权失败', error);
+        } else if (code) {
+            showSuccess('收到授权码，正在处理...');
+            
+            // 发送授权码到API服务器
+            fetch('http://localhost:8001/api/auth/callback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ code: code })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`HTTP错误 ${response.status}: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showSuccess('登录成功，正在返回主页...');
+                    // 存储用户信息
+                    localStorage.setItem('user_id', data.user_id);
+                    localStorage.setItem('username', data.username);
+                    // 延迟跳转，让用户看到成功消息
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                } else {
+                    showError('登录失败', data);
+                }
+            })
+            .catch(error => {
+                showError('登录处理出错', error.toString());
+            });
+        } else {
+            showError('未收到授权码');
+        }
+    </script>
+</body>
+</html> 
