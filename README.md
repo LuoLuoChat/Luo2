@@ -34,11 +34,12 @@ python -m venv venv
 ```
 
 2. 安装依赖包并启动：
-
+   
    ```bash
    pip install -r requirements.txt
-   python main.py
+   python main.py --web-port 8003
    ```
+
 3. 访问网页客户端：
    http://localhost:8002
 
@@ -53,5 +54,5 @@ python -m venv venv
 - 需要使用main.py启动
 
 - 无命令行模式：`--no-command`
-- 指定Web端口号：`--web-port 8003`
 
+- 指定Web端口号：`--web-port 8003`
