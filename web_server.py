@@ -1,7 +1,28 @@
-from flask import Flask, render_template, send_from_directory, request, send_file
+from flask import Flask, render_template, send_from_directory, request, send_file, jsonify
 import os
+import json
 
 app = Flask(__name__)
+
+# 读取配置文件
+def load_config():
+    config_path = os.path.join(os.path.dirname(__file__), 'config.json')
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except:
+        return {
+            "ws_domain": "localhost",
+            "api_domain": "localhost",
+            "web_port": 8002,
+            "ws_port": 8000,
+            "api_port": 8001
+        }
+
+@app.route('/config')
+def get_config():
+    config = load_config()
+    return jsonify(config)
 
 @app.route('/')
 def index():
