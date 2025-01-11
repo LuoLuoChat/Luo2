@@ -26,7 +26,7 @@ async def keep_alive():
     except asyncio.CancelledError:
         pass
 
-async def main(no_command=False):
+async def main(no_command=False, web_port=8002):
     # 启动聊天服务器
     chat_server = ChatServer()
     server = chat_server.run()
@@ -44,11 +44,11 @@ async def main(no_command=False):
     # 在新线程中启动Web服务器
     web_thread = threading.Thread(
         target=run_flask_app,
-        args=(web_app, 8002),
+        args=(web_app, web_port),
         daemon=True
     )
     web_thread.start()
-    logger.info("Web服务器启动在 http://localhost:8002")
+    logger.info(f"Web服务器启动在 http://localhost:{web_port}")
     
     try:
         if no_command:
@@ -73,6 +73,7 @@ if __name__ == "__main__":
     # 添加命令行参数解析
     parser = argparse.ArgumentParser(description='洛²聊天服务器')
     parser.add_argument('--no-command', action='store_true', help='以无命令行模式运行')
+    parser.add_argument('--web-port', type=int, default=8002, help='Web服务器端口号（默认：8002）')
     args = parser.parse_args()
 
     banner = """
@@ -91,22 +92,22 @@ if __name__ == "__main__":
 - exit: 关闭
 
 """
-    banner += """
+    banner += f"""
 ———使用copyright命令查看版权信息———
 
 
 服务器端口:
 - 聊天服务器: ws://localhost:8000
 - API服务器: http://localhost:8001
-- Web客户端: http://localhost:8002
+- Web客户端: http://localhost:{args.web_port}
 =================================
 """
     print(banner)
 
     try:
-        asyncio.run(main(args.no_command))
+        asyncio.run(main(args.no_command, args.web_port))
     except KeyboardInterrupt:
         print("\n系统已关闭")
     except EOFError:
         print("\n检测到后台运行环境，切换到无命令行模式")
-        asyncio.run(main(True)) 
+        asyncio.run(main(True, args.web_port)) 
